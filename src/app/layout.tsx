@@ -4,6 +4,7 @@ import "./globals.css";
 import {ThemeProvider} from "next-themes"
 
 import Providers from "@/providers";
+import connecttoMongodb from "@/lib/db";
 
 
 const geistSans = Geist({
@@ -26,6 +27,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  connecttoMongodb()
   return (
     <Providers>
     

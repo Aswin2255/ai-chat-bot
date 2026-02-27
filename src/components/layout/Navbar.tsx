@@ -37,10 +37,11 @@ export default function Navbar(){
           {/* Right side: theme toggle + name */}
           <div className="flex items-center gap-5">
             {/* Theme Toggle */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 cursor-pointer">
               <Sun className="h-4 w-4 text-muted-foreground" />
               {
                 mounted &&   <Switch
+                className="cursor-pointer"
                 id="theme-toggle"
                 checked={isDark}
                 onCheckedChange={toggleTheme}
@@ -51,8 +52,7 @@ export default function Navbar(){
               <Moon className="h-4 w-4 text-muted-foreground" />
             </div>
 
-            {/* Divider */}
-            <div className="h-5 w-px bg-border" />
+            
 
            
           </div>
