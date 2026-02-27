@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "prepare": "husky"
+    "prepare": "husky install"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.38.1",
