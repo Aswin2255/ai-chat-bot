@@ -1,30 +1,24 @@
 'use server';
 
-import { signupSchema } from '@/lib/authvalidations/authschema';
-import z from 'zod';
+import { LoginInput, SignupInput } from '@/lib/authvalidations/authschema';
+import User from '@/lib/models/User';
 
-export async function signupAction(previousState: unknown, formdata: FormData) {
+export async function signupAction(formdata: SignupInput) {
   try {
-    const singupdata = {
-      email: formdata.get('email'),
-      password: formdata.get('password'),
-      confirmPassword: formdata.get('confirmPassword'),
-    };
-
-    const result = signupSchema.safeParse(singupdata);
-
-    if (!result.success) {
-      return {
-        success: false,
-        errors: z.flattenError(result.error).fieldErrors,
-      };
-    }
-
-    return { success: true };
+    const { email, password, confirmPassword } = formdata;
+    console.log(password, confirmPassword);
+    const isexistingUser = await User.findOne({ email });
+    if (isexistingUser) return { status: false, message: 'User Already Exist' };
   } catch {
     return {
       success: false,
       errors: 'login falied',
     };
   }
+}
+
+export async function loginAction(formdata: LoginInput) {
+  try {
+    console.log(formdata);
+  } catch {}
 }

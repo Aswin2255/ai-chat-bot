@@ -1,3 +1,4 @@
+'use client';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -9,16 +10,36 @@ import {
   FieldSeparator,
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { zodResolver } from '@hookform/resolvers/zod';
+import {
+  LoginInput,
+  SignupInput,
+  signupSchema,
+  loginSchema,
+} from '@/lib/authvalidations/authschema';
+import { useForm } from 'react-hook-form';
+import { loginAction } from '@/app/(auth)/actions/authaction';
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<'div'>) {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginInput>({
+    resolver: zodResolver(loginSchema),
+  });
+  const handelLogin = (data: LoginInput) => {
+    loginAction(data);
+  };
+
   return (
     <div className={cn('flex flex-col gap-6', className)} {...props}>
       <Card className="overflow-hidden p-0">
         <CardContent className="grid p-0 ">
-          <form className="p-6 md:p-8">
+          <form onSubmit={handleSubmit(handelLogin)} className="p-6 md:p-8">
             <FieldGroup>
               <div className="flex flex-col items-center gap-2 text-center">
                 <h1 className="text-2xl font-bold">Welcome back</h1>
@@ -29,23 +50,38 @@ export function LoginForm({
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
+                  {...register('email')}
+                  name="email"
                   id="email"
                   type="email"
                   placeholder="m@example.com"
                   required
                 />
+                {errors.email && (
+                  <>
+                    <p className="text-xs text-red-500">
+                      {errors.email.message}
+                    </p>
+                  </>
+                )}
               </Field>
               <Field>
                 <div className="flex items-center">
                   <FieldLabel htmlFor="password">Password</FieldLabel>
-                  <a
-                    href="#"
-                    className="ml-auto text-sm underline-offset-2 hover:underline"
-                  >
-                    Forgot your password?
-                  </a>
                 </div>
-                <Input id="password" type="password" required />
+                <Input
+                  {...register('password')}
+                  id="password"
+                  type="password"
+                  required
+                />
+                {errors.password && (
+                  <>
+                    <p className="text-xs text-red-500">
+                      {errors.password.message}
+                    </p>
+                  </>
+                )}
               </Field>
               <Field>
                 <Button type="submit">Login</Button>

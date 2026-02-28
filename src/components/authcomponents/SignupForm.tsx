@@ -10,19 +10,32 @@ import {
   FieldSeparator,
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { useActionState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { signupAction } from '@/app/(auth)/actions/authaction';
+import { SignupInput, signupSchema } from '@/lib/authvalidations/authschema';
 
 export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<'div'>) {
-  const [state, action, pending] = useActionState(signupAction, null);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<SignupInput>({
+    resolver: zodResolver(signupSchema),
+  });
+
+  const handelSingup = (data: SignupInput) => {
+    signupAction(data);
+  };
+
   return (
     <div className={cn('flex flex-col gap-6', className)} {...props}>
       <Card className="overflow-hidden p-0">
         <CardContent className="grid p-0 ">
-          <form action={action} className="p-6 md:p-8">
+          <form onSubmit={handleSubmit(handelSingup)} className="p-6 md:p-8">
             <FieldGroup>
               <div className="flex flex-col items-center gap-2 text-center">
                 <h1 className="text-2xl font-bold">Welcome</h1>
@@ -33,53 +46,59 @@ export function SignupForm({
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
+                  {...register('email')}
                   name="email"
                   id="email"
                   type="email"
                   placeholder="m@example.com"
                   required
                 />
-                {state?.errors &&
-                  typeof state.errors === 'object' &&
-                  state.errors.email && (
-                    <p className="text-xs text-red-500">
-                      {state.errors.email[0]}
-                    </p>
-                  )}
+                {errors.email && (
+                  <p className="text-xs text-red-500">{errors.email.message}</p>
+                )}
               </Field>
               <Field>
                 <div className="flex items-center">
                   <FieldLabel htmlFor="password">Password</FieldLabel>
                 </div>
-                <Input name="password" id="password" type="password" required />
-                {state?.errors &&
-                  typeof state.errors === 'object' &&
-                  state.errors.password && (
+                <Input
+                  {...register('password')}
+                  name="password"
+                  id="password"
+                  type="password"
+                  required
+                />
+                {errors.password && (
+                  <>
                     <p className="text-xs text-red-500">
-                      {state.errors.password[0]}
+                      {errors.password.message}
                     </p>
-                  )}
+                  </>
+                )}
               </Field>
               <Field>
                 <div className="flex items-center">
                   <FieldLabel htmlFor="password">Confirm Password</FieldLabel>
                 </div>
                 <Input
+                  {...register('confirmPassword')}
                   name="confirmPassword"
                   id="password"
                   type="password"
                   required
                 />
-                {state?.errors &&
-                  typeof state.errors === 'object' &&
-                  state.errors.confirmPassword && (
-                    <p className="text-xs text-red-500">
-                      {state.errors.confirmPassword[0]}
-                    </p>
-                  )}
+                {errors.confirmPassword && (
+                  <p className="text-xs text-red-500">
+                    {errors.confirmPassword.message}
+                  </p>
+                )}
               </Field>
               <Field>
-                <Button type="submit">Signup</Button>
+                {isSubmitting ? (
+                  <h1>Loading...</h1>
+                ) : (
+                  <Button type="submit">Signup</Button>
+                )}
               </Field>
               <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
                 Or continue with
