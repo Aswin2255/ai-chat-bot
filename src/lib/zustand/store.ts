@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 interface User {
   name: string;
 }
@@ -28,12 +29,19 @@ export const useAuthUser = create<Authstore>((set) => ({
   },
 }));
 
-export const useModel = create<Modelstore>((set) => ({
-  modelDetails: [],
-  setModel(model) {
-    set((state) => ({ modelDetails: [...state.modelDetails, model] }));
-  },
-  clearModel() {
-    set({ modelDetails: [] });
-  },
-}));
+export const useModel = create<Modelstore>()(
+  persist(
+    (set) => ({
+      modelDetails: [],
+      setModel(model: Model) {
+        set((state) => ({ modelDetails: [...state.modelDetails, model] }));
+      },
+      clearModel() {
+        set({ modelDetails: [] });
+      },
+    }),
+    {
+      name: 'model-storage',
+    },
+  ),
+);

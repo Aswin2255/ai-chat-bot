@@ -31,6 +31,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
+import { useModelHook } from '@/hooks/useChat';
+import { AddModelDialog } from './AddmodelDialog';
 
 const MODELS = [
   {
@@ -68,6 +70,7 @@ export default function ChatInputBox() {
   const [newApiKey, setNewApiKey] = useState('');
   const [newProvider, setNewProvider] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { modelDetails, setModel, clearModel } = useModelHook();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -80,6 +83,7 @@ export default function ChatInputBox() {
 
   const handleSend = () => {
     if (!message.trim() && attachedFiles.length === 0) return;
+    if (!modelDetails?.length) setAddModelOpen(true);
     // Handle send logic
     setMessage('');
     setAttachedFiles([]);
@@ -218,66 +222,12 @@ export default function ChatInputBox() {
         </div>
       </div>
 
-      {/* Add Model / API Key Dialog */}
-      <Dialog open={addModelOpen} onOpenChange={setAddModelOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Cpu className="h-4 w-4" />
-              Add Model & API Key
-            </DialogTitle>
-            <DialogDescription>
-              Connect a new provider by entering your API key.
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="grid gap-4 py-2">
-            <div className="grid gap-2">
-              <Label htmlFor="provider">Provider</Label>
-              <Select onValueChange={setNewProvider}>
-                <SelectTrigger id="provider">
-                  <SelectValue placeholder="Select a provider" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="anthropic">Anthropic</SelectItem>
-                  <SelectItem value="openai">OpenAI</SelectItem>
-                  <SelectItem value="google">Google (Gemini)</SelectItem>
-                  <SelectItem value="mistral">Mistral</SelectItem>
-                  <SelectItem value="custom">Custom / Other</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="apikey">API Key</Label>
-              <Input
-                id="apikey"
-                type="password"
-                placeholder="sk-••••••••••••••••"
-                value={newApiKey}
-                onChange={(e) => setNewApiKey(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setAddModelOpen(false)}>
-              Cancel
-            </Button>
-            <Button
-              disabled={!newProvider || !newApiKey}
-              onClick={() => {
-                // Handle save API key logic
-                setAddModelOpen(false);
-                setNewApiKey('');
-                setNewProvider('');
-              }}
-            >
-              Save
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {addModelOpen && (
+        <AddModelDialog
+          addModelOpen={addModelOpen}
+          setAddModelOpen={setAddModelOpen}
+        />
+      )}
     </div>
   );
 }
